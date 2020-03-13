@@ -1,0 +1,73 @@
+
+@import "var";/*引入配置*/
+
+@mixin primary_color(){/*字体 主体色*/
+  [data-theme="theme"] & {
+    color:$primary-color;
+  }
+  [data-theme="theme1"] & {
+    color:$t1-primary-color;
+  }
+  [data-theme="theme2"] & {
+    color:$t2-primary-color;
+  }
+  [data-theme="theme3"] & {
+    color:$t3-primary-color;
+  }
+  [data-theme="theme4"] & {
+    color:$t4-primary-color;
+  }
+}
+
+@mixin primary_border_color(){/*border 主体色*/
+  [data-theme="theme"] & {
+    border-color:$primary-color;
+  }
+  [data-theme="theme1"] & {
+    border-color:$t1-primary-color;
+  }
+  [data-theme="theme2"] & {
+    border-color:$t2-primary-color;
+  }
+  [data-theme="theme3"] & {
+    border-color:$t3-primary-color;
+  }
+  [data-theme="theme4"] & {
+    border-color:$t4-primary-color;
+  }
+}
+
+@mixin primary_bg_color(){/*背景色*/
+  [data-theme="theme"] & {
+    background-color:$primary-bg-color;
+  }
+  [data-theme="theme1"] & {
+    background-color:$t1-primary-bg-color;
+  }
+  [data-theme="theme2"] & {
+    background-color:$t2-primary-bg-color;
+  }
+  [data-theme="theme3"] & {
+    background-color:$t3-primary-bg-color;
+  }
+  [data-theme="theme4"] & {
+    background-color:$t4-primary-bg-color;
+  }
+}
+@mixin primary_bg_color_o(){/*背景色*/
+  [data-theme="theme"] & {
+    background-color:$primary-bg-color;
+  }
+  [data-theme="theme1"] & {
+    background-color:$t1-primary-bg-color-o;
+  }
+  [data-theme="theme2"] & {
+    background-color:$t2-primary-bg-color-o;
+  }
+  [data-theme="theme3"] & {
+    background-color:$t3-primary-bg-color-o;
+  }
+  [data-theme="theme4"] & {
+    background-color:$t4-primary-bg-color-o;
+  }
+}

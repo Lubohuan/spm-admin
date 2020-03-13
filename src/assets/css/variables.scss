@@ -1,0 +1,51 @@
+/*!
+ *
+ * spm-admin
+ *
+ * variables.scss
+ *
+ * SCSS全局变量
+ *
+ */
+
+/*字体颜色*/
+$font-color-1: #303030;
+$font-color-2: #5D5D5D;
+$font-color-3: #9C9C9C;
+$font-color-4: #fff;
+/*边框颜色*/
+$border-color-1: #DDDDDD;
+/*字体大小*/
+$font-size-1: 16px;
+$font-size-2: 14px;
+$font-size-3: 12px;
+
+/*阿里字体图标大小*/
+$icon-size-16:16px;
+$icon-size-18:18px;
+$icon-size-20:20px;
+$icon-size-22:22px;
+$icon-size-24:24px;
+/*字体行高*/
+$line-height-1: 24px;
+$line-height-2: 22px;
+$line-height-3: 20px;
+/*字体font-weight*/
+$font-weight-1: 400;
+$font-weight-2: 500;
+/*背景色*/
+$bg-color-1: #fff;
+$bg-color-2: #F3F3F3;
+/*辅助色*/
+$default-color: #328FE5;
+$warning-color: #E5C05C;
+$danger-color: #F12F2B;
+$success-color: #72D59A;
+$info-color: #909399;
+/**/
+$modalCover:rgba(0,0,0,.3);
+/*modalMaxHeight*/
+$modal-maxHeight-500:500px;
+$modal-maxHeight-550:550px;
+$modal-maxHeight-600:600px;
+$modal-maxHeight-700:700px;

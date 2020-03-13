@@ -1,0 +1,522 @@
+/**
+* @Author: 路博欢
+* @Date: 2019/8/19
+* @Version: 1.0
+* @Last Modified by: 路博欢
+* @Last Modified time: 2019/8/19
+**/
+<comment>
+  # 组件注释
+  新增系统管理员
+</comment>
+<template>
+  <a-modal
+    v-model="visible"
+    centered
+    class="ModalConfigAdmin"
+    :width="920"
+    :afterClose="handleClose"
+    :maskClosable="false"
+  >
+    <template slot="title">{{title}}</template>
+    <a-form :form="form" layout="vertical" ref="aForm">
+      <a-row :gutter="24">
+        <a-col :span="12">
+          <a-form-item
+            label="管理员名称"
+            :validate-status="formError('username') ? 'error' : ''"
+            :help="formError('username') || ''"
+          >
+            <a-input
+              :disabled="type=='tel'"
+              v-decorator="[
+                        'username',
+                        {
+                          rules: [
+                            {
+                              required: true,
+                              message: ' ',
+                            },
+                            {
+                              validator: validatorAdminName,
+                            }
+                          ],
+                        }
+                      ]"
+              placeholder="请输入汉字、英文、数字或其组合"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item
+            label="管理员账号"
+            :validate-status="formError('accountId') ? 'error' : ''"
+            :help="formError('accountId') || ''"
+          >
+            <a-input
+              :disabled="type=='edit'||type=='tel'"
+              v-decorator="[
+                        'accountId',
+                        {
+                          rules: [
+                            {
+                              required: true,
+                              message: ' ',
+                            },
+                             {
+                              validator: validatorAdminAccount,
+                            }
+
+                          ],
+                        }
+                      ]"
+              placeholder="请输入6-18位字符，包含英文字母、数字、下划线，以英文字母开头"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item
+            label="绑定手机号码"
+            :validate-status="formError('tel') ? 'error' : ''"
+            :help="formError('tel') || ''"
+          >
+            <a-input
+              type="tel"
+              @change="changeTel"
+              :disabled="type=='edit'||type=='tel'"
+              v-decorator="[
+                        'tel',
+                        {
+                          rules: [
+                            {
+                              required: true,
+                              message: ' ',
+                            },
+                            {
+                              validator:validatorTel
+                            }
+                          ],
+                        }
+                      ]"
+              placeholder="请输入手机号码！"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" v-if="type=='tel'">
+          <a-form-item
+            label="新手机号"
+            :validate-status="formError('newTel') ? 'error' : ''"
+            :help="formError('newTel') || ''"
+          >
+            <a-input
+              type="tel"
+              @change="changeTel"
+              v-decorator="[
+                        'newTel',
+                        {
+                          rules: [
+                            {
+                              required: true,
+                              message: ' ',
+                            },
+                            {
+                              validator:validatorTel
+                            }
+                          ],
+                        }
+                      ]"
+              placeholder="请输入新的手机号码！"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" v-if="type!='edit'">
+          <a-form-item
+            label="短信验证码"
+            :validate-status="formError('code') ? 'error' : ''"
+            :help="formError('code') || ''"
+          >
+            <a-input-search
+              v-decorator="[
+                        'code',
+                        {
+                          rules: [
+                            {
+                              required: true,
+                              message: '请输入短信验证码！',
+                            }
+                          ],
+                        }
+                      ]"
+              placeholder="请输入短信验证码"
+              @search="getCodeByTel"
+            >
+              <a-button v-if="type=='add'" slot="enterButton" type="primary" :disabled="disGetCode">
+                <span v-if="showGet">获取短信验证码</span>
+                <span v-else>
+                  <span style="display:inline-block;width:20px;">{{seconds}}</span>秒后重新获取
+                </span>
+              </a-button>
+              <a-button v-if="type=='tel'" slot="enterButton" type="primary" :disabled="disGetCode">
+                <span v-if="showGet">获取短信验证码</span>
+                <span v-else>
+                  <span style="display:inline-block;width:20px;">{{seconds}}</span>秒后重新获取
+                </span>
+              </a-button>
+            </a-input-search>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" v-if="type=='add'">
+          <a-form-item
+            label="管理员初始密码"
+            :validate-status="formError('password') ? 'error' : ''"
+            :help="formError('password') || ''"
+          >
+            <a-input
+              v-decorator="[
+                        'password',
+                        {
+                          rules: [
+                            {
+                              required: true,
+                              message: ' ',
+                            },
+                            {
+                              validator:validatorKey
+                            }
+                          ],
+                        }
+                      ]"
+              placeholder="请输入8-14位字符，包含数字、字母、符号组合"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" v-if="type=='tel'">
+          <a-form-item
+            label="密码"
+            :validate-status="formError('newPassword') ? 'error' : ''"
+            :help="formError('newPassword') || ''"
+          >
+            <a-input
+              v-decorator="[
+                        'newPassword',
+                        {
+                          rules: [
+                            {
+                              required: true,
+                              message: ' ',
+                            },
+                            {
+                              validator:validatorKey
+                            }
+                          ],
+                        }
+                      ]"
+              placeholder="请输入您的密码用于安全验证"
+            />
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+    <template slot="footer">
+      <a-button @click="handleClose">取消</a-button>
+      <a-button
+        type="primary"
+        @click="saveConfig"
+        :loading="btnLoading"
+        :disabled="hasErrors(form.getFieldsError())"
+      >确定</a-button>
+    </template>
+  </a-modal>
+</template>
+
+<script>
+export default {
+  name: "ModalAddTenant",
+  components: {},
+  props: {},
+  data() {
+    return {
+      Util,
+      api: {
+        addAdminApi: Util.adminServer + "/admin-user/add", // 新增管理员
+        editAdminApi: Util.adminServer + "/admin-user/edit", // 编辑管理员
+        replaceTelApi: Util.adminServer + "/admin-user/replace-tel", //更换手机号
+        sendSMSApi: Util.adminServer + "/admin-user/send-code" //验证码
+      },
+      btnLoading: false,
+      visible: false,
+      title: "",
+      type: "",
+      disGetCode: true,
+      seconds: 59,
+      showGet: true,
+      form: this.$form.createForm(this),
+      currentRowData: null,
+      notReGetCode: true
+    };
+  },
+  computed: {},
+  created() {},
+  mounted() {},
+  watch: {},
+  methods: {
+    reset(rowData, configType) {
+      this.disGetCode = true;
+      this.seconds = 59;
+      this.showGet = true;
+      this.notReGetCode = true;
+      this.type = configType;
+      this.title =
+        configType == "add"
+          ? "新增管理员"
+          : configType == "edit"
+          ? "编辑管理员"
+          : "修改手机号";
+
+      rowData &&
+        this.$nextTick(() => {
+          this.form.setFieldsValue({
+            name: rowData.name
+          });
+        });
+
+      this.$nextTick(() => {
+        this.form.validateFields();
+      });
+    },
+    changeTel(e) {
+      if (Util.tel.test(String(e.target.value))) {
+        if (this.notReGetCode) {
+          this.disGetCode = false;
+        }
+      } else {
+        this.disGetCode = true;
+      }
+    },
+    /*打开modal的事件*/
+    handleOpen(rowData, configType) {
+      this.visible = true;
+      this.currentRowData = rowData;
+      this.reset(rowData, configType);
+      if (configType != "add") {
+        this.setForm(rowData);
+      }
+    },
+    /*关闭modal的事件*/
+    handleClose() {
+      this.visible = false;
+      this.form.resetFields();
+      //this.reset();
+    },
+    setForm(rowData) {
+      this.$nextTick(() => {
+        this.form.setFieldsValue({
+          name: rowData.name,
+          username: rowData.username,
+          accountId: rowData.accountId,
+          tel: rowData.tel
+        });
+      });
+    },
+    formError(field) {
+      const { getFieldError, isFieldTouched } = this.form;
+      return isFieldTouched(field) && getFieldError(field);
+    },
+    hasErrors(fieldsError) {
+      return Object.keys(fieldsError).some(field => fieldsError[field]);
+    },
+    /*管理员名称校验*/
+    validatorAdminName(rule, value, callback) {
+      const form = this.form;
+      if (Util.adminName.test(String(value))) {
+        callback();
+      } else {
+        callback("请输入汉字、英文、数字或其组合！");
+      }
+    },
+    // 管理员账号校验
+    validatorAdminAccount(rule, value, callback) {
+      const form = this.form;
+      if (
+        Util.adminAccount.test(String(value)) &&
+        Util.beginWidthAb.test(String(value))
+      ) {
+        callback();
+      } else {
+        callback(
+          "请输入6-18位字符，包含英文字母、数字、下划线，以英文字母开头"
+        );
+      }
+    },
+    // 管理员手机校验
+    validatorTel(rule, value, callback) {
+      const form = this.form;
+      if (Util.tel.test(String(value))) {
+        callback();
+      } else {
+        callback("请输入正确的手机号码！");
+      }
+    },
+    //校验密码
+    validatorKey(rule, value, callback) {
+      const form = this.form;
+      if (Util.key.test(String(value))) {
+        callback();
+      } else {
+        callback("请输入8-14位字符，包含数字、字母、符号组合！");
+      }
+    },
+    //获取短信验证码
+    getCodeByTel() {
+      this.reGetCode();
+      let params = {
+        phoneNumber:
+          this.type == "add"
+            ? this.form.getFieldValue("tel")
+            : this.form.getFieldValue("newTel"),
+        smsType: 3
+      };
+      this.$get(this.api.sendSMSApi, params)
+        .then(response => {
+          this.loading = false;
+          Util.processRes(
+            response,
+            () => {
+              this.$message.success("获取成功，请注意查收！");
+            },
+            () => {}
+          );
+          Util.processError(this, response);
+        })
+        .catch(res => {
+          this.loading = false;
+          Util.processError(this, res);
+        });
+    },
+    //60秒之后重新发送
+    reGetCode() {
+      this.showGet = false;
+      this.disGetCode = true;
+      this.notReGetCode = false;
+      let timer = setInterval(() => {
+        this.seconds--;
+        if (this.seconds == -1) {
+          this.showGet = true;
+          this.disGetCode = false;
+          this.seconds = 59;
+          this.notReGetCode = true;
+          clearInterval(timer);
+        }
+      }, 1000);
+    },
+    saveConfig() {
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          if (this.type == "add") {
+            this.addAdmin(values); //新增请求后台接口
+          } else if (this.type == "edit") {
+            this.editAdmin(values); //编辑请求后台接口
+          } else {
+            this.replaceTelAdmin(values); //编辑请求后台接口
+          }
+        }
+      });
+    },
+    addAdmin(values) {
+      this.btnLoading = true;
+      let params = values;
+      this.$post(this.api.addAdminApi, params)
+        .then(response => {
+          this.loading = false;
+          this.btnLoading = false;
+          Util.processRes(
+            response,
+            () => {
+              this.$message.success("新增成功！");
+              this.handleClose();
+              this.$emit("searchList");
+            },
+            () => {}
+          );
+          Util.processError(this, response);
+        })
+        .catch(res => {
+          this.loading = false;
+          this.btnLoading = false;
+          Util.processError(this, res);
+        });
+    },
+    editAdmin(values) {
+      let params = {
+        id: this.currentRowData.id,
+        username: values.username
+      };
+      this.$post(this.api.editAdminApi, params)
+        .then(response => {
+          this.loading = false;
+          Util.processRes(
+            response,
+            () => {
+              this.$message.success("修改成功！");
+              this.handleClose();
+              this.$emit("searchList");
+            },
+            () => {}
+          );
+          Util.processError(this, response);
+        })
+        .catch(res => {
+          this.loading = false;
+          Util.processError(this, res);
+        });
+    },
+    replaceTelAdmin(values) {
+      let params = {
+        id: this.currentRowData.id,
+        tel: values.newTel,
+        code: values.code,
+        password: values.newPassword
+      };
+      this.$post(this.api.replaceTelApi, params)
+        .then(response => {
+          this.loading = false;
+          Util.processRes(
+            response,
+            () => {
+              this.$message.success("手机号更换成功！");
+              this.handleClose();
+              this.$emit("searchList");
+            },
+            () => {}
+          );
+          Util.processError(this, response);
+        })
+        .catch(res => {
+          this.loading = false;
+          Util.processError(this, res);
+        });
+    }
+  },
+  destroyed() {}
+};
+</script>
+
+<style lang="scss">
+.ModalConfigAdmin {
+  .ant-modal-body {
+    height: 380px;
+  }
+  .ant-form-vertical {
+    .ant-col-12 {
+      height: 82px;
+      overflow: hidden;
+    }
+  }
+}
+.modal-btn {
+  border-top: 1px solid #e8e8e8;
+  padding: 10px 16px;
+  text-align: right;
+  margin: 20px -49px -25px -49px;
+}
+</style>
